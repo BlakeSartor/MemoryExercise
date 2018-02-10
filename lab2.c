@@ -10,71 +10,85 @@
 int numRecs = 0;
 
 struct book *headPtr;
-struct book *mover = null;
 
 void printAllRecord() {
-  struct book *incrementer = headPtr;
+  if (numRecs == 0 ) {
+    printf("%s\n", "Database is empty!");
+  }
+  else {
+  struct book *counter = headPtr;
   for (int i = 0; i < numRecs; i++) {
-    printf("%lu\n",sizeof(*headPtr) );
-    printf("%s%s", "Title: ", headPtr->title);
-    printf("%s%s", "Author: ", headPtr->author);
-    printf("%s%f\n", "Price: ", headPtr->price);
-    incrementer = incrementer+(sizeof(struct book)*numRecs);
+    printf("%s\n", "=====");
+    printf("%s%s\n", "Title: ", counter->title);
+    printf("%s%s\n", "Author: ", counter->author);
+    printf("%s%f\n", "Price: ", counter->price);
+    counter++;
+    }
   }
 }
 
 void printNumberRecord() {
   printf("%s%d\n", "Number of Records : ", numRecs);
+
 }
 
 void printSizeOfDatabase() {
   if (numRecs == 0) {
     printf("%s\n", "Database is empty!");
+
   }
   else {
     printf("%s%lu%s\n", "Size of Databse : ", sizeof(struct book)*numRecs, " bytes");
   }
 }
 
-void * addRecord(char title[MAXTITLE], char author[MAXAUTHOR], float price) {
+void addRecord(char title[MAXTITLE], char author[MAXAUTHOR], float price) {
   numRecs += 1;
 
   if (numRecs == 1) {
-    headPtr = (struct book*) malloc (sizeof(struct book)*numRecs);
+
+    headPtr = malloc (sizeof(struct book)*numRecs);
     strcpy(headPtr->title, title);
     strcpy(headPtr->author, author);
     headPtr->price = price;
-    return headPtr;
   }
+
   else {
     printf("%d\n",numRecs );
-    mover = malloc (sizeof(struct book)*numRecs);
-    printf("%lu\n", sizeof(&mover));
-    memcpy(mover, headPtr, sizeof(struct book) * numRecs);
-    printf("%s\n", "MEMCPY COmplete");
-    free(headPtr);
-    mover = mover + sizeof(struct book);
-    printf("%lu\n", sizeof(&mover));
-    strcpy(mover->title, title);
-    strcpy(mover->author, author);
-    mover->price = price;
-    //free(mover);
-    return mover;
+    struct book *tmp =  realloc (headPtr, sizeof(struct book)*numRecs);
+    //memcpy(tmp, headPtr, sizeof(struct book) * numRecs);
+    //free(headPtr);
+    headPtr = tmp;
+    tmp = tmp + (numRecs - 1);
+    strcpy(tmp->title, title);
+    strcpy(tmp->author, author);
+    tmp->price = price;
   }
 }
 
 void deleteRecord() {
+  if (numRecs == 0) {
+    printf("%s\n", "Database is empty, no record to delete");
+  }
+  else {
+    printf("%s%d\n", "Removing record number : ", numRecs);
+    numRecs = numRecs - 1;
+    struct book *tmp = realloc (headPtr, sizeof(struct book)*numRecs);
+    headPtr = tmp;
+  }
+}
+
+void accessNumber() {
 
 }
 
 int main(int argc, char * argv[] ){
+  addRecord(book1_title,book1_author,book1_price);
+  addRecord(book2_title,book2_author,book2_price);
+  addRecord(book3_title,book3_author,book3_price);
+  addRecord(book4_title,book4_author,book4_price);
+
   while (1) {
-    char book1_title[] = "Harry Potter";
-    char book1_author[] = "JK Rowling";
-    float book1_price = 42.00;
-
-    //struct book *book1 = (struct book*) malloc (sizeof(struct book));
-
     char input[100] = {0};
     char titleInput[MAXTITLE] = {0};
     char authorInput[MAXAUTHOR] = {0};
@@ -91,35 +105,47 @@ int main(int argc, char * argv[] ){
     printf("%s\n", "7. Exit");
     printf("Enter selection : ");
     fgets(input, sizeof(input), stdin);
-      if (strlen(input) <= 2) {
-        switch(input[0]) {
-            case '1' :
-              printAllRecord();
-              break;
-            case '2' :
-              printNumberRecord();
-              break;
-            case '3' :
-              printSizeOfDatabase();
-              break;
-            case '4' :
-              printf("%s", "Enter Title : ");
-              fgets(titleInput,sizeof(titleInput), stdin);
-              printf("%s", "Enter Author : ");
-              fgets(authorInput,sizeof(authorInput), stdin);
-              printf("%s", "Enter Price : ");
-              fgets(priceInput,sizeof(priceInput), stdin);
-              price = atof(priceInput);
-              headPtr = addRecord(titleInput,authorInput,price);
-              printf("%lu\n", sizeof(*headPtr));
-              break;
-            case '7' :
-              free(headPtr);
-              return 0;
-            default  :
-              printf("%s\n", "Incorrect input, please try again...");
-              break;
+    input[strcspn(input, "\n\r")] = 0;
+    if (strlen(input) <= 1) {
+      switch(input[0]) {
+        case '1' :
+          printAllRecord();
+          printf("%s\n", "=====");
+          break;
+        case '2' :
+          printNumberRecord();
+          break;
+        case '3' :
+          printSizeOfDatabase();
+          break;
+        case '4' :
+          printf("%s", "Enter Title : ");
+          fgets(titleInput,sizeof(titleInput), stdin);
+          titleInput[strcspn(titleInput, "\n\r")] = 0;
+          printf("%s", "Enter Author : ");
+          fgets(authorInput,sizeof(authorInput), stdin);
+          authorInput[strcspn(authorInput, "\n\r")] = 0;
+          printf("%s", "Enter Price : ");
+          fgets(priceInput,sizeof(priceInput), stdin);
+          priceInput[strcspn(priceInput, "\n\r")] = 0;
+          price = atof(priceInput);
+          addRecord(titleInput,authorInput,price);
+          break;
+        case '5' :
+          deleteRecord();
+          break;
+        case '6' :
+          break;
+        case '7' :
+          free(headPtr);
+          return 0;
+        default  :
+          printf("%s\n", "Incorrect input, please try again...");
+          break;
         }
-      }
     }
+    else {
+      printf("%s\n", "Incorrect input, please try again...");
+    }
+  }
 }
