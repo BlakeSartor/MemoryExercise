@@ -16,19 +16,21 @@ void printAllRecord() {
     printf("%s\n", "Database is empty!");
   }
   else {
-  struct book *counter = headPtr;
-  for (int i = 0; i < numRecs; i++) {
-    printf("%s\n", "=====");
-    printf("%s%s\n", "Title: ", counter->title);
-    printf("%s%s\n", "Author: ", counter->author);
-    printf("%s%f\n", "Price: ", counter->price);
-    counter++;
+    printf("%s\n", "Records :");
+    struct book *counter = headPtr;
+    for (int i = 0; i < numRecs; i++) {
+      printf("%s\n", "=====");
+      printf("%s%s\n", "Title:  ", counter->title);
+      printf("%s%s\n", "Author: ", counter->author);
+      printf("%s%s%.2f\n", "Price:  ", "$", counter->price);
+      counter++;
     }
+    printf("\n%s%d\n", "Total Records: ", numRecs);
   }
 }
 
 void printNumberRecord() {
-  printf("%s%d\n", "Number of Records : ", numRecs);
+  printf("%s%d\n", "Total Records : ", numRecs);
 
 }
 
@@ -46,7 +48,6 @@ void addRecord(char title[MAXTITLE], char author[MAXAUTHOR], float price) {
   numRecs += 1;
 
   if (numRecs == 1) {
-
     headPtr = malloc (sizeof(struct book)*numRecs);
     strcpy(headPtr->title, title);
     strcpy(headPtr->author, author);
@@ -54,7 +55,6 @@ void addRecord(char title[MAXTITLE], char author[MAXAUTHOR], float price) {
   }
 
   else {
-    printf("%d\n",numRecs );
     struct book *tmp =  realloc (headPtr, sizeof(struct book)*numRecs);
     //memcpy(tmp, headPtr, sizeof(struct book) * numRecs);
     //free(headPtr);
@@ -129,8 +129,14 @@ int main(int argc, char * argv[] ){
           fgets(priceInput,sizeof(priceInput), stdin);
           priceInput[strcspn(priceInput, "\n\r")] = 0;
           price = atof(priceInput);
+          if (price <= 0.0) {
+            printf("%s\n", "Invalid price, please try again...");
+            break;
+          }
+          else {
           addRecord(titleInput,authorInput,price);
           break;
+          }
         case '5' :
           deleteRecord();
           break;
