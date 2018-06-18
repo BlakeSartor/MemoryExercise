@@ -1,1 +1,1 @@
-# Memory Excersies in C just for fun
+# Memory Excersies in C
